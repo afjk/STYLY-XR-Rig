@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using UnityEditor;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
@@ -16,7 +17,6 @@ namespace Styly.XRRig.Build
     /// </summary>
     public class BuildForPicoUnityOpenXrSdk
     {
-        private static readonly string packageIdentifier = "https://github.com/Pico-Developer/PICO-Unity-OpenXR-SDK.git#release_1.4.0";
 
         /// <summary>
         /// Build method called from GameCI
@@ -122,10 +122,72 @@ namespace Styly.XRRig.Build
             // Set isCameraSubsystem to true
             SetFieldValueOfOpenXrFeature(BuildTargetGroup.Android, "com.pico.openxr.feature.passthrough", "isCameraSubsystem", true);
             
-            // Configure PICO Hand Tracking
-            ConfigurePicoHandTracking();
+            // Configure PICO Hand Tracking (synchronous version for CI)
+            ConfigurePicoHandTrackingForCI();
             
             Debug.Log("PICO Unity OpenXR SDK setup for CI completed.");
+        }
+
+        /// <summary>
+        /// Configure PICO hand tracking synchronously for CI environments
+        /// This is based on SetupSdkUtils.ConfigurePicoHandTracking but runs synchronously
+        /// </summary>
+        private static void ConfigurePicoHandTrackingForCI()
+        {
+            try
+            {
+                // Load the PICO project setting asset
+                var picoProjectSetting = Resources.Load("PICOProjectSetting");
+                if (picoProjectSetting != null)
+                {
+                    ModifyPicoProjectSettingAssetSync(picoProjectSetting);
+                }
+                else
+                {
+                    Debug.LogWarning("PICOProjectSetting asset not found. Hand tracking configuration skipped.");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"Failed to configure PICO hand tracking: {e.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Modify the PICOProjectSetting asset to enable hand tracking
+        /// This is a synchronous version of the SetupSdkUtils method
+        /// </summary>
+        private static void ModifyPicoProjectSettingAssetSync(object picoProjectSetting)
+        {
+            try
+            {
+                var type = picoProjectSetting.GetType();
+
+                // Set isHandTracking to true (handTrackingSupportType defaults to ControllersAndHands)
+                const string IsHandTrackingFieldName = "isHandTracking";
+                var isHandTrackingField = type.GetField(IsHandTrackingFieldName, BindingFlags.Public | BindingFlags.Instance);
+                if (isHandTrackingField != null && isHandTrackingField.FieldType == typeof(bool))
+                {
+                    isHandTrackingField.SetValue(picoProjectSetting, true);
+                    Debug.Log("Enabled PICO Hand Tracking.");
+                }
+                else
+                {
+                    Debug.LogWarning($"Could not find field '{IsHandTrackingFieldName}' or it has the wrong type in PICOProjectSetting asset. Hand tracking configuration may have failed.");
+                }
+
+                // Save changes
+                if (picoProjectSetting is UnityEngine.Object unityObject)
+                {
+                    EditorUtility.SetDirty(unityObject);
+                    AssetDatabase.SaveAssets();
+                    AssetDatabase.Refresh();
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"Failed to modify PICO hand tracking settings: {e.Message}");
+            }
         }
     }
 }

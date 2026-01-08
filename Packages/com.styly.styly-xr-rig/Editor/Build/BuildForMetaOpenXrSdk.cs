@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using UnityEditor;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
@@ -16,7 +17,6 @@ namespace Styly.XRRig.Build
     /// </summary>
     public class BuildForMetaOpenXrSdk
     {
-        private static readonly string packageIdentifier = "com.unity.xr.meta-openxr@2.3.0";
 
         /// <summary>
         /// Build method called from GameCI
