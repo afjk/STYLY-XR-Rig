@@ -116,7 +116,7 @@ namespace Styly.XRRig.Build
             SetRenderMode(OpenXRSettings.RenderMode.MultiPass, BuildTargetGroup.Android);
             
             // Step 5: Fix XR Project Validation Issues
-            SetupSdk.XRProjectValidationFixAll.FixAllIssues(BuildTargetGroup.Android);
+            XRProjectValidationFixAll.FixAllIssues(BuildTargetGroup.Android);
             
             // Step 6: Additional PICO-specific Settings
             // Set isCameraSubsystem to true
