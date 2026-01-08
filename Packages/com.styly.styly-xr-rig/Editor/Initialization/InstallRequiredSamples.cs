@@ -24,7 +24,7 @@ namespace Styly.XRRig
         public static void InstallPackageSamples()
         {
             // Skip in batch mode (e.g., when building via CI/CD)
-            if (UnityEngine.Application.isBatchMode)
+            if (Application.isBatchMode)
             {
                 return;
             }

@@ -11,7 +11,7 @@ class RestartUnityEditorAfterPackageInstallation
     static void ExecuteOnceAfterPackageInstallation()
     {
         // Skip in batch mode (e.g., when building via CI/CD)
-        if (UnityEngine.Application.isBatchMode)
+        if (Application.isBatchMode)
         {
             return;
         }
