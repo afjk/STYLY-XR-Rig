@@ -23,6 +23,12 @@ namespace Styly.XRRig
         [InitializeOnLoadMethod]
         public static void InstallPackageSamples()
         {
+            // Skip in batch mode (e.g., when building via CI/CD)
+            if (Application.isBatchMode)
+            {
+                return;
+            }
+
             // Get the path of this package
             var MyPackageInfo = UnityEditor.PackageManager.PackageInfo.FindForAssembly(System.Reflection.MethodInfo.GetCurrentMethod().DeclaringType.Assembly);
             string MyPackagePath = MyPackageInfo.resolvedPath;
