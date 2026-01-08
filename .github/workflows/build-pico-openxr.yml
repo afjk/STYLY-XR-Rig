@@ -5,6 +5,9 @@ on:
     branches: [ develop ]    # develop ブランチにマージされたとき実行
   workflow_dispatch:         # Actions 画面から手動実行も可能
 
+permissions:
+  contents: read
+
 jobs:
   build-pico-openxr:
     name: Build for PICO Unity OpenXR SDK
