@@ -1,0 +1,54 @@
+name: Build PICO Unity OpenXR
+
+on:
+  push:
+    branches: [ develop ]    # develop ブランチにマージされたとき実行
+  workflow_dispatch:         # Actions 画面から手動実行も可能
+
+permissions:
+  contents: read
+
+jobs:
+  build-pico-openxr:
+    name: Build for PICO Unity OpenXR SDK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          lfs: true  # Git LFS 対応
+
+      - name: Free up disk space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: true      # Node.js や Android toolchain のキャッシュも削除
+          docker-images: true   # 未使用Dockerイメージ削除
+          large-packages: true  # 不要パッケージ削除
+
+      - name: Cache Unity Library
+        uses: actions/cache@v4
+        with:
+          path: Library
+          key: Library-Android-PicoOpenXR-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: |
+            Library-Android-PicoOpenXR-
+            Library-Android-
+            Library-
+
+      - name: Build Unity Project (PICO Unity OpenXR - Android)
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          targetPlatform: Android                                           # Android ビルド
+          unityVersion: 6000.0.59f2                                         # Unity バージョン指定
+          buildMethod: Styly.XRRig.Build.BuildForPicoUnityOpenXrSdk.Build  # ビルドメソッド指定
+
+      - name: Upload PICO OpenXR Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: PicoOpenXRBuild
+          path: build/Android/PicoOpenXR.apk
