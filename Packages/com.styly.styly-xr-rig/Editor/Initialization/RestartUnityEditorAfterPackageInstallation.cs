@@ -10,6 +10,12 @@ class RestartUnityEditorAfterPackageInstallation
     [InitializeOnLoadMethod]
     static void ExecuteOnceAfterPackageInstallation()
     {
+        // Skip in batch mode (e.g., when building via CI/CD)
+        if (UnityEngine.Application.isBatchMode)
+        {
+            return;
+        }
+
         if (IsFirstRun.IsFirstRunForVersion())
         {
             if (EditorUtility.DisplayDialog("Restart Unity",
