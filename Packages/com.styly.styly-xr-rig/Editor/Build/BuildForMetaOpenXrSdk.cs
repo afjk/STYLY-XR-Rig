@@ -86,16 +86,14 @@ namespace Styly.XRRig.Build
         /// <summary>
         /// Setup SDK synchronously for CI environments
         /// This is based on SetupSdk_MetaOpenXrSdk.SetUpSdkSettings but runs synchronously
+        /// Note: Some steps like EnableXRFeatureSet may need manual configuration before CI
         /// </summary>
         private static void SetupSdkForCI()
         {
             // Step 1: Enable the OpenXR Loader
             EnableXRPlugin(BuildTargetGroup.Android, "UnityEngine.XR.OpenXR.OpenXRLoader");
             
-            // Step 2: Enable the XR Feature Set
-            EnableXRFeatureSet(BuildTargetGroup.Android, "com.unity.openxr.featureset.meta");
-            
-            // Step 3: Enable OpenXR Features
+            // Step 2: Enable OpenXR Features (skip feature set for CI - should be pre-configured)
             EnableOpenXrFeatures(BuildTargetGroup.Android, new string[]
             {
                 "com.unity.openxr.feature.input.handtracking",
@@ -108,21 +106,21 @@ namespace Styly.XRRig.Build
                 "com.unity.openxr.feature.arfoundation-meta-camera"
             });
             
-            // Step 4: Enable Interaction Profiles
+            // Step 3: Enable Interaction Profiles
             EnableInteractionProfiles(BuildTargetGroup.Android, new string[]
             {
                 "com.unity.openxr.feature.input.handinteraction",
                 "com.unity.openxr.feature.input.metaquestplus"
             });
             
-            // Step 5: Setup Other Settings
+            // Step 4: Setup Other Settings
             SetAndroidMinimumApiLevel(AndroidSdkVersions.AndroidApiLevel29);
             ApplyStylyPipelineAsset();
             UseNewInputSystemOnly();
             SetGraphicsAPIs(BuildTarget.Android, new List<GraphicsDeviceType> { GraphicsDeviceType.Vulkan });
             SetRenderMode(OpenXRSettings.RenderMode.MultiPass, BuildTargetGroup.Android);
             
-            // Step 6: Fix XR Project Validation Issues
+            // Step 5: Fix XR Project Validation Issues
             SetupSdk.XRProjectValidationFixAll.FixAllIssues(BuildTargetGroup.Android);
             
             Debug.Log("Meta OpenXR SDK setup for CI completed.");
