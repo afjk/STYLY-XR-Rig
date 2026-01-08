@@ -121,7 +121,7 @@ namespace Styly.XRRig.Build
             SetRenderMode(OpenXRSettings.RenderMode.MultiPass, BuildTargetGroup.Android);
             
             // Step 5: Fix XR Project Validation Issues
-            SetupSdk.XRProjectValidationFixAll.FixAllIssues(BuildTargetGroup.Android);
+            XRProjectValidationFixAll.FixAllIssues(BuildTargetGroup.Android);
             
             Debug.Log("Meta OpenXR SDK setup for CI completed.");
         }
