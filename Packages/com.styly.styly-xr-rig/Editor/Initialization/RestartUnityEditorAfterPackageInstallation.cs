@@ -1,6 +1,7 @@
 using System.Linq;
 using UnityEditor;
 using UnityEditor.PackageManager;
+using UnityEngine;
 
 /// <summary>
 /// Restart Unity Editor after package installation
