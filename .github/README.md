@@ -74,6 +74,33 @@ GitHub Actionsを実行するには、以下のシークレットをリポジト
 2. 必要なシーンがBuild Settingsに含まれているか確認
 3. ワークフローログで詳細なエラーメッセージを確認
 
+### Prefab Variant parent missing エラーの場合
+
+`STYLY XR Rig.prefab` は XR Interaction Toolkit の「Hands Interaction Demo」サンプルに含まれる `XR Origin Hands (XR Rig)` プレハブの Prefab Variant です。このサンプルは通常 Unity エディタで自動的にインストールされますが、CI/CD環境ではインストールされないため、ビルドが失敗することがあります。
+
+**解決方法**: ワークフローを2段階に分けて、まずサンプルをインストールしてからビルドを実行します。
+
+```yaml
+# Step 1: Install required samples
+- name: Install Required Samples
+  uses: game-ci/unity-builder@v4
+  env:
+    UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+    UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+    UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+  with:
+    targetPlatform: Android
+    unityVersion: 6000.0.59f2
+    buildMethod: Styly.XRRig.Initialization.CISampleInstaller.InstallSamplesAndExit
+
+# Step 2: Build the project (samples are now installed)
+- name: Build Unity Project
+  uses: game-ci/unity-builder@v4
+  # ... (your existing build configuration)
+```
+
+`CISampleInstaller.InstallSamplesAndExit` メソッドは、`required_samples.json` に記載された全てのサンプルをインストールし、その後Unityを終了します。
+
 ### Unity Licenseの取得方法
 
 GameCIの公式ドキュメントを参照してください：

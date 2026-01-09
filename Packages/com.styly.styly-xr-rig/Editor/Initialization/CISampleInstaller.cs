@@ -17,6 +17,40 @@ namespace Styly.XRRig.Initialization
         private static readonly string RequiredSamplesJson = "required_samples.json";
 
         /// <summary>
+        /// Entry point for CI/CD to install samples and exit.
+        /// This method can be called from command line via -executeMethod
+        /// 
+        /// Usage in GitHub Actions workflow:
+        /// <code>
+        /// - name: Install Required Samples
+        ///   uses: game-ci/unity-builder@v4
+        ///   with:
+        ///     buildMethod: Styly.XRRig.Initialization.CISampleInstaller.InstallSamplesAndExit
+        /// </code>
+        /// 
+        /// This should be called as a separate step BEFORE the main build step to ensure
+        /// that all required samples (e.g., XR Interaction Toolkit's "Hands Interaction Demo")
+        /// are installed before Unity attempts to import prefabs that depend on them.
+        /// </summary>
+        public static void InstallSamplesAndExit()
+        {
+            Debug.Log("=== CI Sample Installer: Starting sample installation ===");
+            
+            try
+            {
+                InstallRequiredSamplesForCI();
+                Debug.Log("=== CI Sample Installer: Sample installation completed successfully ===");
+                EditorApplication.Exit(0);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"=== CI Sample Installer: Sample installation failed: {e.Message} ===");
+                Debug.LogError(e.StackTrace);
+                EditorApplication.Exit(1);
+            }
+        }
+
+        /// <summary>
         /// Install all required package samples for CI/CD build.
         /// This method runs synchronously and is designed to work in batch mode.
         /// </summary>
