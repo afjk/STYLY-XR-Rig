@@ -7,6 +7,7 @@ using UnityEditor.Build.Reporting;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.XR.OpenXR;
+using Styly.XRRig.Initialization;
 using static Styly.XRRig.SetupSdk.SetupSdkUtils;
 
 namespace Styly.XRRig.Build
@@ -26,6 +27,10 @@ namespace Styly.XRRig.Build
             try
             {
                 Debug.Log("Starting PICO Unity OpenXR SDK build setup...");
+                
+                // Install required samples first (XR Interaction Toolkit samples are needed for STYLY XR Rig prefab)
+                Debug.Log("Installing required package samples...");
+                CISampleInstaller.InstallRequiredSamplesForCI();
                 
                 // Switch to Android build target
                 EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.Android, BuildTarget.Android);
